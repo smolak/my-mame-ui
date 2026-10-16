@@ -18,6 +18,8 @@ A build-ready spec for a personal, desktop-only macOS **launcher** for MAME (MAM
 
 ## Decisions so far
 
+- [MAME CLI and data sources](tickets/03-mame-cli-data.md): one cached `-listxml` per MAME version (320 MB, ~3 s, stream-parse) is the Library source; Verified comes from batched CRC-only `-verifyroms` (~0.45 s/process, ~500 names/chunk, check SMB mount first since missing rompaths fail silently); launch is `mame [args] <machine>` from a fixed cwd with exit codes 0/2/5/6; the 0.280 set mostly verifies on 0.289, and drifted sets verify bad but still launch.
+
 ## Not yet specified
 
 - Per-machine option overrides (video/shader/input options passed as CLI args) — shape depends on Launch flow.
