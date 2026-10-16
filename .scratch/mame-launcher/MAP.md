@@ -18,6 +18,8 @@ A build-ready spec for a personal, desktop-only macOS **launcher** for MAME (MAM
 
 ## Decisions so far
 
+- [Electrobun capabilities on macOS](tickets/01-electrobun-capabilities.md): Usable on arm64 with the Bun runtime pinned (v2.0.x, changing fast). RPC is typed but JSON-only (no streaming). Bun.spawn and bun:sqlite work as-is. appdata:// is confined to userData and has no Range support, so serve media from a local Bun.serve. Watch for the webview freezing after sleep/wake.
+
 ## Not yet specified
 
 - Per-machine option overrides (video/shader/input options passed as CLI args) — shape depends on Launch flow.
