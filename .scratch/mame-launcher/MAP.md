@@ -20,6 +20,7 @@ A build-ready spec for a personal, desktop-only macOS **launcher** for MAME (MAM
 
 - [Electrobun capabilities on macOS](tickets/01-electrobun-capabilities.md): Usable on arm64 with the Bun runtime pinned (v2.0.x, changing fast). RPC is typed but JSON-only (no streaming). Bun.spawn and bun:sqlite work as-is. appdata:// is confined to userData and has no Range support, so serve media from a local Bun.serve. Watch for the webview freezing after sleep/wake.
 - [ScreenScraper API](tickets/02-screenscraper-api.md): GET api2 with dev creds (via forum) + user ssid/sspassword; MAME systemeid=75, match by `romnom=<set>.zip`; obey per-user quotas returned by `ssuserInfos`/`jeuInfos` (~1 req/s/thread, 430/431 = stop for the day); media types ss/sstitle/marquee/wheel/flyer/video-normalized/manuel; CC BY-NC-SA, cache locally.
+- [MAME CLI and data sources](tickets/03-mame-cli-data.md): one cached `-listxml` per MAME version (320 MB, ~3 s, stream-parse) is the Library source; Verified comes from batched CRC-only `-verifyroms` (~0.45 s/process, ~500 names/chunk, check SMB mount first since missing rompaths fail silently); launch is `mame [args] <machine>` from a fixed cwd with exit codes 0/2/5/6; the 0.280 set mostly verifies on 0.289, and drifted sets verify bad but still launch.
 
 ## Not yet specified
 
