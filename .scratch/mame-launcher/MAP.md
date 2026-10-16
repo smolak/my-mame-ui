@@ -18,6 +18,8 @@ A build-ready spec for a personal, desktop-only macOS **launcher** for MAME (MAM
 
 ## Decisions so far
 
+- [ScreenScraper API](tickets/02-screenscraper-api.md): GET api2 with dev creds (via forum) + user ssid/sspassword; MAME systemeid=75, match by `romnom=<set>.zip`; obey per-user quotas returned by `ssuserInfos`/`jeuInfos` (~1 req/s/thread, 430/431 = stop for the day); media types ss/sstitle/marquee/wheel/flyer/video-normalized/manuel; CC BY-NC-SA, cache locally.
+
 ## Not yet specified
 
 - Per-machine option overrides (video/shader/input options passed as CLI args) — shape depends on Launch flow.
