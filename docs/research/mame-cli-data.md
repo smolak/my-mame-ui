@@ -1,6 +1,6 @@
 # Research: MAME 0.289 CLI and data sources
 
-Ticket: [03 — MAME CLI and data sources](../tickets/03-mame-cli-data.md)
+Ticket: [03 — MAME CLI and data sources](https://github.com/smolak/my-mame-ui/issues/4)
 Date: 2026-10-16. Binary: Homebrew build, `mame -version` → `0.289 (unknown)`.
 
 Sources:

@@ -1,6 +1,6 @@
 # ScreenScraper API (v2) for the MAME Launcher
 
-Research for ticket [02](../tickets/02-screenscraper-api.md). Gathered 2026-10-16. No authenticated calls were made and no accounts were registered.
+Research for ticket [02](https://github.com/smolak/my-mame-ui/issues/3). Gathered 2026-10-16. No authenticated calls were made and no accounts were registered.
 
 ## Sources
 
