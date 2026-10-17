@@ -14,5 +14,7 @@ Glossary for the MAME launcher. Terms only — no implementation detail.
 - **ROMs offline** — the state where a rompath folder is unreachable (share not mounted). Statuses are frozen, not recomputed.
 - **Media** — descriptive text and assets about a Machine (screenshots, titles, marquees, videos, descriptions) obtained from ScreenScraper.
 - **Preview video** — a short Media clip of a Machine played inside the Launcher while browsing. Not gameplay: gameplay audio and video are always MAME's own.
-- **Favorite / Recent** — the principal's personal marks on Machines; owned by the Launcher, not by MAME.
-- **Play session** — one run of MAME for a Machine, started by the Launcher, from launch until MAME exits.
+- **Favorite / Recent** — the principal's personal marks on Machines; owned by the Launcher, not by MAME. A Machine becomes Recent when a Play session starts, unless that session turns out to be a Failed launch.
+- **Play session** — one run of MAME for a Machine, started by the Launcher, from launch until MAME exits. At most one runs at a time.
+- **Failed launch** — a Play session that ended in an error within a few seconds of starting. It does not make a Machine Recent and adds no Play time.
+- **Play time** — the summed wall-clock length of a Machine's Play sessions, excluding Failed launches.
