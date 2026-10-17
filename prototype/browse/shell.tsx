@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type Library, type Machine, type Status, STATUS_LABEL,
-  useLibrary, mediaUrl, hasMedia, launch, useFavToggle, usePreview, typingInField, Toast,
+  useLibrary, mediaUrl, hasMedia, realSynopsis, launch, useFavToggle, usePreview, typingInField, Toast,
 } from "./lib";
 
 type View = "list" | "details" | "grid" | "focus";
@@ -464,7 +464,7 @@ function Pane({ lib, m, g, toggleFav, setSelM, fanart }: { lib: Library; m: Mach
         <dt>Set</dt><dd><code>{m.set}</code>{m.parent && <> · clone of <code>{m.parent}</code></>}</dd>
         {m.recent && <><dt>Play time</dt><dd>2 h 14 min · last played 3 days ago</dd></>}
       </dl>
-      <p className="synopsis">{media ? "Synopsis from ScreenScraper would sit here: a paragraph or two about the game, its story and how it plays." : ""}</p>
+      <p className="synopsis">{realSynopsis(m) ?? (media ? "Synopsis from ScreenScraper would sit here: a paragraph or two about the game, its story and how it plays." : "")}</p>
       {fam.length > 1 && (
         <>
           <h4>Versions ({fam.length}) · V cycles</h4>

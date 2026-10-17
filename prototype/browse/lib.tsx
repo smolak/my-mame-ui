@@ -30,7 +30,8 @@ export type Library = {
 export function useLibrary(): Library | null {
   const [lib, setLib] = useState<Library | null>(null);
   useEffect(() => {
-    fetch("/machines.json").then((r) => r.json()).then((rows: any[]) => {
+    fetch("/real-media/index.json").then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then((x) => { REAL = x; })
+      .then(() => fetch("/machines.json")).then((r) => r.json()).then((rows: any[]) => {
       const all: Machine[] = rows.map((r) => ({
         set: r[0], desc: r[1], year: r[2], manuf: r[3], parent: r[4], driver: r[5],
         rotate: r[6], status: r[7], genre: r[8], fav: !!(r[9] & 1), recent: !!(r[9] & 2),
@@ -108,7 +109,12 @@ export function useGroups(lib: Library, f: Filters) {
 // ---------- Fake Media (stand-ins for ScreenScraper ss / sstitle / wheel / fanart) ----------
 const hue = (s: string) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+/** Sets with real ScreenScraper Media on disk (prototype/browse/real-media), keyed by Parent set. */
+let REAL: Record<string, { files: Record<string, string>; synopsis?: string }> = {};
+export const realSynopsis = (m: Machine) => REAL[m.parent || m.set]?.synopsis?.replace(/&quot;/g, "\"").replace(/&#0?39;/g, "'").replace(/&amp;/g, "&");
 export function mediaUrl(m: Machine, kind: "ss" | "sstitle" | "wheel" | "fanart"): string {
+  const real = REAL[m.parent || m.set]?.files[kind];
+  if (real) return `/real-media/${m.parent || m.set}/${real}`;
   const h = hue(m.parent || m.set); // Clones inherit the Parent's Media
   const vert = m.rotate === 90 || m.rotate === 270;
   const [w, hgt] = kind === "wheel" ? [400, 120] : kind === "fanart" ? [1600, 900] : vert ? [300, 400] : [400, 300];
@@ -126,7 +132,7 @@ export function mediaUrl(m: Machine, kind: "ss" | "sstitle" | "wheel" | "fanart"
 }
 
 /** Fake "not scraped yet" for ~15% so placeholders are visible in every variant. */
-export const hasMedia = (m: Machine) => (hue(m.parent || m.set) + 1) % 7 !== 0; // Clones inherit the Parent's Media
+export const hasMedia = (m: Machine) => !!REAL[m.parent || m.set] || (hue(m.parent || m.set) + 1) % 7 !== 0; // Clones inherit the Parent's Media
 
 export const STATUS_LABEL: Record<Status, string> = { missing: "Missing", available: "Available", verified: "Verified", damaged: "Damaged" };
 

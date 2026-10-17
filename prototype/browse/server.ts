@@ -8,6 +8,14 @@ const server = Bun.serve({
   routes: {
     "/": index,
     "/round1": round1,
+    // Real ScreenScraper Media pulled for a few sets (gitignored): /real-media/index.json + files
+    "/real-media/index.json": async () => {
+      const out: Record<string, unknown> = {};
+      for (const f of new Bun.Glob("*/meta.json").scanSync(new URL("./real-media", import.meta.url).pathname))
+        out[f.split("/")[0]] = await Bun.file(new URL(`./real-media/${f}`, import.meta.url)).json();
+      return Response.json(out);
+    },
+    "/real-media/*": (req) => new Response(Bun.file(new URL("." + new URL(req.url).pathname, import.meta.url))),
     "/machines.json": () => new Response(Bun.file(new URL("./machines.json", import.meta.url))),
   },
 });
