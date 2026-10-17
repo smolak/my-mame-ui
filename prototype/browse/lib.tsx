@@ -115,7 +115,7 @@ export function mediaUrl(m: Machine, kind: "ss" | "sstitle" | "wheel" | "fanart"
   const title = esc(m.desc.replace(/ \(.*$/, "").slice(0, 28));
   let body = "";
   if (kind === "wheel") body = `<text x="200" y="76" font-size="38" font-weight="900" font-style="italic" text-anchor="middle" fill="hsl(${h},90%,60%)" stroke="#000" stroke-width="2">${title}</text>`;
-  else if (kind === "fanart") body = `<defs><radialGradient id="g" cx="30%" cy="40%"><stop offset="0" stop-color="hsl(${h},70%,35%)"/><stop offset="1" stop-color="hsl(${(h + 60) % 360},60%,8%)"/></radialGradient></defs><rect width="1600" height="900" fill="url(#g)"/>`;
+  else if (kind === "fanart") body = `<defs><radialGradient id="g" cx="30%" cy="40%"><stop offset="0" stop-color="hsl(${h},70%,35%)"/><stop offset="1" stop-color="hsl(${(h + 60) % 360},60%,8%)"/></radialGradient></defs><rect width="1600" height="900" fill="url(#g)"/><circle cx="${1100 + (h % 200)}" cy="380" r="300" fill="hsl(${(h + 180) % 360},70%,45%)" opacity=".35"/><polygon points="0,900 500,${420 + (h % 120)} 900,900" fill="hsl(${(h + 30) % 360},60%,22%)"/><polygon points="700,900 1250,${300 + (h % 150)} 1600,900" fill="hsl(${(h + 90) % 360},55%,16%)"/><text x="1500" y="840" font-size="110" font-weight="900" font-style="italic" text-anchor="end" fill="#fff" opacity=".18">${title}</text>`;
   else {
     body = `<rect width="${w}" height="${hgt}" fill="hsl(${h},45%,${kind === "ss" ? 18 : 10}%)"/>`;
     for (let i = 0; i < 9; i++) body += `<rect x="${(h * (i + 3)) % (w - 40)}" y="${(h * (i + 7) * 3) % (hgt - 40)}" width="${16 + (i % 3) * 10}" height="${16 + (i % 2) * 12}" fill="hsl(${(h + i * 40) % 360},80%,60%)"/>`;

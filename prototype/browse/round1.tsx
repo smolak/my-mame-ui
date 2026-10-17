@@ -18,7 +18,7 @@ function App() {
   const [sel, setSel] = useState<Machine | undefined>();
   const go = (d: number) => {
     const next = KEYS[(KEYS.indexOf(variant) + d + KEYS.length) % KEYS.length];
-    history.replaceState(null, "", `?variant=${next}`);
+    history.replaceState(null, "", `/round1?variant=${next}`);
     setVariant(next);
   };
   useEffect(() => {
