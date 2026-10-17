@@ -13,6 +13,9 @@ Glossary for the MAME launcher. Terms only — no implementation detail.
 - **Damaged** — an Available Machine that fails MAME's verification. It may still run.
 - **ROMs offline** — the state where a rompath folder is unreachable (share not mounted). Statuses are frozen, not recomputed.
 - **Media** — descriptive text and assets about a Machine (screenshots, titles, marquees, videos, descriptions) obtained from ScreenScraper.
+- **Browse** — the Launcher's main screen for finding a Machine in the Library. Shown in one of several Views.
+- **View** — one way of laying out Browse: List, Details, Grid or Focus. Switching View keeps the query and the selected Machine.
+- **Fanart** — wide artwork Media about a Machine (not a screenshot), shown as the backdrop of the Focus View.
 - **Preview video** — a short Media clip of a Machine played inside the Launcher while browsing. Not gameplay: gameplay audio and video are always MAME's own.
 - **Favorite / Recent** — the principal's personal marks on Machines; owned by the Launcher, not by MAME. A Machine becomes Recent when a Play session starts, unless that session turns out to be a Failed launch.
 - **Play session** — one run of MAME for a Machine, started by the Launcher, from launch until MAME exits. At most one runs at a time.
