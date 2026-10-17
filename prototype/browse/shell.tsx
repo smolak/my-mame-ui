@@ -178,13 +178,16 @@ function Loaded(p: any) {
     return () => window.removeEventListener("keydown", on);
   }, [idx, rows, groups, cols, isGrid, cur, q, pane]);
 
-  const fanartOn = hasMedia(cur ?? lib.all[0]) && cur && (fanart === "everywhere" || (fanart === "focus" && view === "focus"));
+  const fanartWanted = fanart === "everywhere" || (fanart === "focus" && view === "focus");
+  const fanartOn = fanartWanted && cur && hasMedia(cur);
   const showPane = pane && view !== "focus";
   const viewProps = { lib, rows, groups, idx, cur, pick, setSelM, expand, expanded, toggleFav, sort, setSort };
 
   return (
     <div className={`s ${showPane ? "with-pane" : ""} ${view === "focus" ? "focus" : ""}`}>
       {fanartOn && <Backdrop m={cur!} strong={view === "focus"} />}
+      {fanartWanted && cur && !hasMedia(cur) && <div className="fanart-note">no fanart: {cur.set} not scraped yet</div>}
+      {!fanartWanted && fanart === "focus" && <div className="fanart-note">fanart shows in Focus view (⌘4), or set “everywhere” below</div>}
       <header className="s-bar">
         <div className="s-search">
           <input ref={search} className="search" placeholder="Search or filter  ( / )   e.g. street is:fav year:199 maker:capcom" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -441,6 +444,7 @@ function Pane({ lib, m, g, toggleFav, setSelM, fanart }: { lib: Library; m: Mach
   const fam = family(lib, g);
   return (
     <aside className="s-pane">
+      {fanart && media && <div className="pane-fanart" style={{ backgroundImage: `url("${mediaUrl(m, "fanart")}")` }}><span>fanart</span></div>}
       <div className={`shot ${m.rotate % 180 ? "vert" : ""}`}>
         {media ? <img src={mediaUrl(m, tab)} /> : <div className="ph">No Media yet<br /><small>queued for scrape</small></div>}
         {media && playing && tab === "ss" && <div className="playing">▶ Preview video</div>}
@@ -473,7 +477,6 @@ function Pane({ lib, m, g, toggleFav, setSelM, fanart }: { lib: Library; m: Mach
           </ul>
         </>
       )}
-      {fanart && <p className="hint">Fanart is behind the whole window in this mode.</p>}
     </aside>
   );
 }

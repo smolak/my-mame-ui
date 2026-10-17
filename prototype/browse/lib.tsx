@@ -126,7 +126,7 @@ export function mediaUrl(m: Machine, kind: "ss" | "sstitle" | "wheel" | "fanart"
 }
 
 /** Fake "not scraped yet" for ~15% so placeholders are visible in every variant. */
-export const hasMedia = (m: Machine) => hue(m.set) % 7 !== 0;
+export const hasMedia = (m: Machine) => (hue(m.parent || m.set) + 1) % 7 !== 0; // Clones inherit the Parent's Media
 
 export const STATUS_LABEL: Record<Status, string> = { missing: "Missing", available: "Available", verified: "Verified", damaged: "Damaged" };
 
