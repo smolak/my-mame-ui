@@ -7,7 +7,10 @@ Glossary for the MAME launcher. Terms only — no implementation detail.
 - **Parent / Clone** — a Clone is a variant of a Parent Machine (region, revision, bootleg).
 - **ROM set** — the files a Machine needs. The principal's collection is non-merged: each set is self-contained.
 - **Library** — every Machine the installed MAME knows about, with the principal's status for each.
-- **Available** — a Machine whose ROM set is present in the rompath. Says nothing about correctness.
-- **Verified** — an Available Machine whose ROM set passes MAME's own verification for the installed MAME version.
+- **Missing** — a Machine for which at least one required file (its own ROM set, BIOS, device ROMs or CHD) is not present.
+- **Available** — a Machine for which every required file is present. Says nothing about correctness.
+- **Verified** — an Available Machine that passes MAME's own verification for the installed MAME version, including sets MAME rates "best available" (a file no one has ever dumped).
+- **Damaged** — an Available Machine that fails MAME's verification. It may still run.
+- **ROMs offline** — the state where a rompath folder is unreachable (share not mounted). Statuses are frozen, not recomputed.
 - **Media** — descriptive text and assets about a Machine (screenshots, titles, marquees, videos, descriptions) obtained from ScreenScraper.
 - **Favorite / Recent** — the principal's personal marks on Machines; owned by the Launcher, not by MAME.
