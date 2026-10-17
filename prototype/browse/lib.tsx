@@ -34,7 +34,7 @@ export function useLibrary(): Library | null {
       .then(() => fetch("/machines.json")).then((r) => r.json()).then((rows: any[]) => {
       const all: Machine[] = rows.map((r) => ({
         set: r[0], desc: r[1], year: r[2], manuf: r[3], parent: r[4], driver: r[5],
-        rotate: r[6], status: r[7], genre: r[8], fav: !!(r[9] & 1), recent: !!(r[9] & 2),
+        rotate: r[6], status: r[7], genre: r[8] ?? "", fav: !!(r[9] & 1), recent: !!(r[9] & 2),
       }));
       const bySet = new Map(all.map((m) => [m.set, m]));
       const clones = new Map<string, Machine[]>();
@@ -50,7 +50,7 @@ export function useLibrary(): Library | null {
       const manufCount = count((m) => m.manuf.replace(/ \(.*\)$/, ""));
       setLib({
         all, bySet, clones,
-        genres: [...new Set(all.map((m) => m.genre))].sort(),
+        genres: [...new Set(all.map((m) => m.genre))].filter(Boolean).sort(),
         decades: [...new Set(all.map((m) => decadeOf(m.year)))].filter(Boolean).sort(),
         manufs: [...manufCount].sort((a, b) => b[1] - a[1]).slice(0, 60).map(([k]) => k).sort(),
       });
