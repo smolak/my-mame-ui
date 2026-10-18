@@ -2,7 +2,7 @@
 
 Spike for the "Launch process spike" ticket. Run 2026-10-18 with MAME 0.289, Electrobun 2.0.2 (Hutch 0.27.1, `mainProcess: "bun"`, Bun 1.4.0). Code: `spike/launch/` on branch `spike/launch-process`.
 
-Status: **macOS measured. Windows and Linux not yet run.**
+Status: **all three OSes measured.** macOS locally (macOS 26 arm64, the principal's MAME 0.289) and on CI (`macos-15`, Homebrew MAME 0.289). Windows and Linux only on GitHub-hosted CI: `windows-2025` (Windows Server 2025, official MAME 0.289 x64) and `ubuntu-24.04` (distro MAME **0.264**, under Xvfb). Workflow: `.github/workflows/launch-spike.yml`. CI uses `pong`, which needs no ROMs.
 
 ## macOS 26 (arm64)
 
@@ -45,10 +45,39 @@ The Launch flow decision assumed "SIGTERM, then kill after a timeout". That does
 
 `before-quit` is synchronous: the handler must set `e.response = { allow: false }` immediately. An async confirm dialog ("MAME is running … Quit both?") therefore has to veto first, ask, and then call `Utils.quit()` again.
 
-## Windows / Linux
+## Linux (ubuntu-24.04 CI, MAME 0.264, Xvfb)
 
-Not run yet. To do:
+Same as macOS:
+- SIGTERM and SIGINT are ignored. SIGQUIT and SIGHUP kill MAME without saving.
+- The Lua stop file gives exit 0 in ~200 ms.
+- MAME **survives** both a normal Launcher quit and a crash.
+- before-quit + stop file + re-quit works (MAME exits in ~95 ms).
 
-1. `bun spike/launch/probe/signals.ts <mame-home-dir> <machine>` (set `MAME_BIN` if `mame` isn't on PATH). Record the JSON lines. On Windows the cases are `luastop` and plain `kill` (TerminateProcess).
-2. Build the spike app (`hutch electrobun build`) and run it once per mode (`quit`, `crash`, `graceful`) with `SPIKE_CTL` pointing at a control JSON. Record the log, and whether `mame` is still running afterwards.
-3. Windows only: does `Bun.spawn` of `mame.exe` from the packaged app flash a console window? Does `windowsHide: true` remove it, and does it also hide MAME's game window?
+## Windows (windows-2025 CI, MAME 0.289 x64)
+
+The Launcher is started **detached** (no inherited console), as it would be from Explorer.
+
+| check | result |
+|---|---|
+| PE subsystems | `launcher.exe` GUI (2). `bun.exe` and `mame.exe` are console (3). |
+| Console window when spawning `mame.exe` (default options) | **none**. Diffing top-level windows against a baseline finds only MAME's game window and the Launcher window. |
+| `windowsHide: true` | **hides MAME's game window too**. Never use it. |
+| `proc.kill()` (TerminateProcess) | instant, no save |
+| Lua stop file | exit 0 in ~200 ms |
+| Normal Launcher quit with no before-quit handling | **MAME dies** with the Launcher (not orphaned, unlike macOS/Linux). Abrupt, so no save. |
+| Launcher crash (TerminateProcess on the Bun process) | **MAME dies** |
+| before-quit + stop file + re-quit | MAME exits 0 in ~140 ms, then the app quits |
+
+Electrobun's Windows launcher appears to tear down the whole process tree when the app exits. Its `[electrobun:process]` spawn/exit tracking shows in the dev-build stderr. We don't know which mechanism (a job object or an explicit kill), and it didn't matter for these results.
+
+## Cross-OS summary
+
+- **Graceful stop = the Lua stop file on all three OSes.** No signal-based graceful stop exists: macOS and Linux ignore SIGTERM and SIGINT, and Windows has no signals. Hard stop = SIGKILL / TerminateProcess, which loses cfg and nvram.
+- **Quitting while MAME runs needs the before-quit veto flow on every OS.** Without it, macOS and Linux leave MAME orphaned, and Windows kills it without saving.
+- **A Launcher crash** leaves MAME running on macOS and Linux and kills it on Windows. Either way, the Play session has no recorded end.
+- **Windows spawn options:** the defaults are right. No console window appears, and `windowsHide` must stay off.
+
+## Caveats
+
+- Windows was measured on Server 2025, not Windows 11. Linux was measured on MAME 0.264 under Xvfb, not 0.289 on a desktop session.
+- Console behaviour was checked only for the dev build launched detached. A packaged and installed build wasn't tried.
