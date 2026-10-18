@@ -27,4 +27,4 @@ $rows = foreach ($w in [Win]::Visible()) {
   $p = Get-Process -Id ([int]$w[0]) -ErrorAction SilentlyContinue
   [pscustomobject]@{ pid = [int]$w[0]; process = $p.ProcessName; class = $w[1]; title = $w[2] }
 }
-$rows | Where-Object { $_.process -match '^(mame|conhost|OpenConsole|WindowsTerminal|launcher|bun)$' } | ConvertTo-Json -Compress
+@($rows) | ConvertTo-Json -Compress
