@@ -1,0 +1,78 @@
+# Launch process spike: run the MAME/Launcher process probes on Windows and Linux (macOS as control).
+# Throwaway: lives on the spike/launch-process branch only. Uses the ROM-free machine `pong`.
+name: launch-spike
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [spike/launch-process]
+    paths: [spike/launch/**, .github/workflows/launch-spike.yml]
+
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            mame_args: "-sound none"
+          - os: ubuntu-24.04
+            mame_args: "-video soft -sound none"
+          - os: macos-15
+            mame_args: "-sound none"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+        working-directory: spike/launch
+    env:
+      MAME_ARGS: ${{ matrix.mame_args }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install MAME (Windows, official 0.289)
+        if: runner.os == 'Windows'
+        run: |
+          curl -sSL -o "$RUNNER_TEMP/mame.exe" https://github.com/mamedev/mame/releases/download/mame0289/mame0289b_x64.exe
+          7z x "$RUNNER_TEMP/mame.exe" -o"$RUNNER_TEMP/mame" -y > /dev/null
+          echo "MAME_BIN=$RUNNER_TEMP/mame/mame.exe" >> "$GITHUB_ENV"
+          echo "MAME_HOME=$RUNNER_TEMP/mame" >> "$GITHUB_ENV"
+      - name: Install MAME + webview deps (Linux, distro package)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q mame xvfb libwebkit2gtk-4.1-0 libgtk-3-0 libayatana-appindicator3-1 librsvg2-2
+          echo "MAME_BIN=/usr/games/mame" >> "$GITHUB_ENV"
+          mkdir -p ~/.mame && echo "MAME_HOME=$HOME/.mame" >> "$GITHUB_ENV"
+      - name: Install MAME (macOS, Homebrew)
+        if: runner.os == 'macOS'
+        run: |
+          brew install mame
+          echo "MAME_BIN=$(brew --prefix)/bin/mame" >> "$GITHUB_ENV"
+          mkdir -p ~/.mame && echo "MAME_HOME=$HOME/.mame" >> "$GITHUB_ENV"
+      - name: MAME version
+        run: '"$MAME_BIN" -version'
+
+      - name: Build spike app
+        run: npx --yes electrobun@2.0.2 build
+
+      - name: Probe signals / Lua stop file
+        run: |
+          RUN=""; [ "$RUNNER_OS" = Linux ] && RUN="xvfb-run -a"
+          $RUN bun probe/signals.ts "$MAME_HOME" pong | tee -a "$RUNNER_TEMP/results.jsonl"
+      - name: Probe launcher quit modes
+        run: |
+          RUN=""; [ "$RUNNER_OS" = Linux ] && RUN="xvfb-run -a"
+          $RUN bun probe/app-modes.ts "$MAME_HOME" pong | tee -a "$RUNNER_TEMP/results.jsonl"
+
+      - name: Summary
+        if: always()
+        run: |
+          { echo "### ${{ matrix.os }}"; echo '```'; cat "$RUNNER_TEMP/results.jsonl" 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results-${{ matrix.os }}
+          path: ${{ runner.temp }}/results.jsonl

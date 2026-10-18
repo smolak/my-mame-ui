@@ -1,6 +1,6 @@
 // Plain-Bun probe (no Electrobun): how does MAME react to each stop signal, and does the Lua stop file work?
 // usage: bun probe/signals.ts <mame-home-dir> <machine>
-// MAME_BIN overrides the binary (default "mame" on PATH). Each case starts a fresh MAME, waits 6 s, then stops it.
+// MAME_BIN overrides the binary (default "mame" on PATH); MAME_ARGS adds space-separated options (e.g. "-video soft -sound none"). Each case starts a fresh MAME, waits 6 s, then stops it.
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -11,7 +11,8 @@ const cases = process.platform === "win32" ? ["luastop", "kill"] : ["SIGTERM", "
 
 for (const c of cases) {
 	const stopFile = join(tmpdir(), `mymame-stop-${Date.now()}`);
-	const args = [bin, "-window", "-skip_gameinfo", ...(c === "luastop" ? ["-autoboot_script", script] : []), machine];
+	const extra = (process.env.MAME_ARGS ?? "").split(" ").filter(Boolean);
+	const args = [bin, "-window", "-skip_gameinfo", ...extra, ...(c === "luastop" ? ["-autoboot_script", script] : []), machine];
 	const p = Bun.spawn(args, { cwd, stdout: "ignore", stderr: "pipe", env: { ...process.env, MYMAME_STOP_FILE: stopFile } });
 	await Bun.sleep(6000);
 	const t = Date.now();
