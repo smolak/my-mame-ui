@@ -21,3 +21,4 @@ Glossary for the MAME launcher. Terms only — no implementation detail.
 - **Play session** — one run of MAME for a Machine, started by the Launcher, from launch until MAME exits. At most one runs at a time.
 - **Failed launch** — a Play session that ended in an error within a few seconds of starting. It does not make a Machine Recent and adds no Play time.
 - **Play time** — the summed wall-clock length of a Machine's Play sessions, excluding Failed launches.
+- **Launch options** — extra MAME options the principal attaches to one Machine, applied on every Play session of that Machine on top of the Launcher-wide ones. Owned by the Launcher; MAME's own files are untouched. A Clone does not inherit its Parent's Launch options.
